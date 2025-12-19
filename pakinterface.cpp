@@ -55,10 +55,6 @@ const vcc::utils::cartridge_catalog cartridge_catalog_(
 	.append("Cartridges"));
 
 void PakAssertInterupt(Interrupt interrupt, InterruptSource source);
-static void PakAssertCartrigeLine(void* host_key, bool line_state);
-static void PakWriteMemoryByte(void* host_key, unsigned char data, unsigned short address);
-static unsigned char PakReadMemoryByte(void* host_key, unsigned short address);
-static void PakAssertInterupt(void* host_key, Interrupt interrupt, InterruptSource source);
 
 
 class vcc_expansion_port_bus : public ::vcc::bus::expansion_port_bus
@@ -171,26 +167,6 @@ public:
 	}
 
 };
-
-static void PakAssertCartrigeLine(void* /*host_key*/, bool line_state)
-{
-	SetCart(line_state);
-}
-
-static void PakWriteMemoryByte(void* /*host_key*/, unsigned char data, unsigned short address)
-{
-	MemWrite8(data, address);
-}
-
-static unsigned char PakReadMemoryByte(void* /*host_key*/, unsigned short address)
-{
-	return MemRead8(address);
-}
-
-static void PakAssertInterupt(void* /*host_key*/, Interrupt interrupt, InterruptSource source)
-{
-	PakAssertInterupt(interrupt, source);
-}
 
 std::filesystem::path PakGetSystemRomPath()
 {
