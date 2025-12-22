@@ -1014,6 +1014,8 @@ void SaveConfig() {
 
 unsigned __stdcall EmuLoop(HANDLE hEvent)
 {
+	SetThreadDescription(GetCurrentThread(), L"** Emulation Thread");
+
 	static float FPS;
 	static unsigned int FrameCounter=0;	
 	CalibrateThrottle();
