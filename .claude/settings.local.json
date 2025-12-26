@@ -6,7 +6,11 @@
       "Bash(git -C /Users/svetzal/Work/OSS/DREAM-VCC log --oneline -20)",
       "Bash(xargs cat:*)",
       "Bash(git remote:*)",
-      "Bash(git remote add:*)"
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(git fetch:*)",
+      "Bash(cat:*)"
     ]
   }
 }
