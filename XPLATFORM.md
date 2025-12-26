@@ -31,36 +31,36 @@ graph TB
         Linux[Linux Adapter]
         WASM[WASM Adapter]
         Others[...]
-        
+
         Win32 --> PAI[Platform Adapter Interface]
         macOS --> PAI
         Linux --> PAI
         WASM --> PAI
         Others --> PAI
     end
-    
+
     subgraph Core["EMULATOR CORE - libcore"]
         PAI --> Session[emulator_session<br/>Core Interface]
-        
+
         Session --> Inputs[Inputs<br/>- Keys<br/>- Touch<br/>- Axis<br/>- Cmds]
         Session --> Outputs[Outputs<br/>- Video<br/>- Audio<br/>- Serial]
         Session --> State[State<br/>- Save<br/>- Load<br/>- Config]
-        
+
         subgraph EmulatorCore["Core Components"]
             CPU[CPU] <--> Memory[Memory]
             Memory <--> Devices[Devices]
             Devices <--> Timing[Timing]
-            
+
             Devices --> Video[Video Chip]
             Devices --> Audio[Audio Chips]
             Devices --> Serial[Serial Ports]
         end
-        
+
         Inputs -.-> EmulatorCore
         EmulatorCore -.-> Outputs
         State -.-> EmulatorCore
     end
-    
+
     style Platform fill:#e1f5ff
     style Core fill:#fff4e1
     style EmulatorCore fill:#f0f0f0
@@ -134,7 +134,7 @@ namespace vcc::core
         std::string name;
         std::string description;
         std::string category;       // Grouping hint (not a menu!)
-        
+
         struct parameter_info
         {
             std::string name;
@@ -143,7 +143,7 @@ namespace vcc::core
             bool required;
             command_param default_value;
         };
-        
+
         std::vector<parameter_info> parameters;
     };
 }
@@ -197,7 +197,7 @@ namespace vcc::core
         uint32_t display_aspect_num;        // Display aspect ratio numerator
         uint32_t display_aspect_den;        // Display aspect ratio denominator
         uint64_t frame_number;              // Sequential frame counter
-        
+
         // Optional palette for indexed modes
         std::span<const uint32_t> palette;  // Up to 256 RGBA entries
     };
