@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(git -C /Users/svetzal/Work/OSS/DREAM-VCC log --oneline -20)",
+      "Bash(xargs cat:*)",
+      "Bash(git remote:*)",
+      "Bash(git remote add:*)"
+    ]
+  }
+}
