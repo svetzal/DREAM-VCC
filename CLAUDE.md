@@ -78,3 +78,15 @@ MSBuild property sheets in project root:
 ## 6309 CPU Emulation Status
 
 Some Hitachi 6309 instructions are unemulated or untested. See `docs/VCC-Notes.md` for the complete list. Reference documentation in `docs/The_6309_Book.pdf`.
+
+## Cross-Platform Architecture (Planned)
+
+A platform-agnostic architecture is planned to enable the emulator to run on multiple platforms (macOS, Linux, Web/WASM, mobile, etc.). The design separates pure emulation logic from platform-specific concerns:
+
+- **libcore**: Platform-independent emulation core with `emulator_session` interface
+- **Platform Adapters**: Implement `platform_adapter` interface for each target (Win32, macOS, WASM, etc.)
+- **No file paths in core**: Core deals only with byte streams; platform handles storage
+- **Pull-based output**: Platform controls timing for video/audio
+- **Command-based actions**: Discoverable, extensible command system instead of rigid API
+
+See `xplatform.md` for the complete architecture specification and migration plan.
