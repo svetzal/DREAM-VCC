@@ -10,7 +10,10 @@
       "Bash(git branch:*)",
       "Bash(git push:*)",
       "Bash(git fetch:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(gh api:*)"
     ]
   }
 }
