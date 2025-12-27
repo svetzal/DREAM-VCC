@@ -46,24 +46,69 @@ graph TB
         Session --> Outputs[Outputs<br/>- Video<br/>- Audio<br/>- Serial]
         Session --> State[State<br/>- Save<br/>- Load<br/>- Config]
 
-        subgraph EmulatorCore["Core Components"]
-            CPU[CPU] <--> Memory[Memory]
-            Memory <--> Devices[Devices]
-            Devices <--> Timing[Timing]
+        subgraph CoCo3["Color Computer 3 Hardware"]
+            CPU["CPU<br/>6809 / 6309"]
 
-            Devices --> Video[Video Chip]
-            Devices --> Audio[Audio Chips]
-            Devices --> Serial[Serial Ports]
+            subgraph GIME["GIME - TCC1014"]
+                MMU[MMU<br/>Memory Mapping]
+                Graphics[Graphics<br/>Video Generation]
+                IRQSteering[Interrupt<br/>Steering]
+                Timer[Timer]
+                Palette[Palette<br/>Registers]
+            end
+
+            subgraph PIAs["Peripheral Interface Adapters"]
+                PIA0["PIA 0<br/>Keyboard/Joystick"]
+                PIA1["PIA 1<br/>DAC/Sound/Cassette"]
+            end
+
+            subgraph Memory["Memory"]
+                RAM["RAM<br/>128K - 8MB"]
+                ROM["ROM<br/>32KB"]
+            end
+
+            subgraph Expansion["Expansion Port"]
+                Cart["Cartridge Slot"]
+                FD502["FD502<br/>Floppy"]
+                HD["HardDisk"]
+                MPI["MPI<br/>Multi-Pak"]
+                Becker["Becker<br/>DriveWire"]
+                GMC["GMC<br/>PSG Audio"]
+            end
+
+            CPU <--> |Address/Data Bus| GIME
+            GIME <--> MMU
+            MMU <--> RAM
+            MMU <--> ROM
+            CPU <--> |I/O Bus| PIA0
+            CPU <--> |I/O Bus| PIA1
+            CPU <--> |I/O Bus| Cart
+            Cart --- FD502
+            Cart --- HD
+            Cart --- MPI
+            Cart --- Becker
+            Cart --- GMC
+
+            Graphics --> |Video| Outputs
+            PIA1 --> |Audio| Outputs
+            GMC -.-> |Audio| Outputs
+            PIA0 <-.-> |Keyboard/Joystick| Inputs
+            IRQSteering --> CPU
+            PIA0 --> |HSYNC/VSYNC| IRQSteering
+            PIA1 --> |FIRQ| IRQSteering
         end
 
-        Inputs -.-> EmulatorCore
-        EmulatorCore -.-> Outputs
-        State -.-> EmulatorCore
+        Inputs -.-> CoCo3
+        State -.-> CoCo3
     end
 
     style Platform fill:#e1f5ff
     style Core fill:#fff4e1
-    style EmulatorCore fill:#f0f0f0
+    style CoCo3 fill:#f0f0f0
+    style GIME fill:#ffe0b2
+    style PIAs fill:#c8e6c9
+    style Memory fill:#bbdefb
+    style Expansion fill:#e1bee7
     style Session fill:#c8e6c9
     style PAI fill:#bbdefb
 ```
