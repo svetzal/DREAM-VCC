@@ -698,6 +698,75 @@ void run_cycles(size_t count);
 
 ---
 
+## Latency Considerations
+
+For games and interactive software, latency is critical to user experience. The architecture must minimize end-to-end latency in both input and audio paths.
+
+> **Audio quality is paramount.** Users notice audio glitches (pops, clicks, dropouts) immediately, while dropped video frames often go unnoticed. When resources are constrained, always prioritize audio stability over video smoothness. A solid 30fps with perfect audio is far better than stuttery 60fps with audio artifacts.
+
+### Input Latency Budget
+
+| Stage | Target | Notes |
+|-------|--------|-------|
+| Platform input capture | < 1ms | OS-level event handling |
+| Input → emulator core | < 1ms | Event queue processing |
+| Emulator processing | ~16ms | One frame at 60fps |
+| Video render + display | 8-16ms | Depends on vsync, display |
+| **Total input-to-photon** | **< 50ms** | Perceptible threshold ~100ms |
+
+**Recommendations:**
+- Process input events at the start of each frame, not queued for next frame
+- Provide `run_cycles()` for sub-frame input processing when needed
+- Platform adapters should use low-latency input APIs (raw input, polling)
+
+### Audio Latency Budget
+
+| Stage | Target | Notes |
+|-------|--------|-------|
+| Audio generation | Per-scanline | ~63µs per line, ~16ms per frame |
+| Core → platform buffer | < 5ms | Pull-based audio consumption |
+| Platform audio buffer | 10-40ms | OS/driver dependent |
+| DAC + speaker | < 5ms | Hardware dependent |
+| **Total audio latency** | **< 50ms** | Musical timing threshold ~20ms |
+
+**Recommendations:**
+- Generate audio in small chunks (per-scanline or per-N-cycles), not per-frame
+- Platform adapters should use low-latency audio APIs:
+  - Windows: WASAPI exclusive mode (~10ms achievable)
+  - macOS: Core Audio (~10ms achievable)
+  - Linux: JACK or PipeWire low-latency mode
+  - Web: AudioWorklet with small buffer sizes
+- Provide configurable buffer sizes (latency vs. stability tradeoff)
+
+### Audio Buffer Strategy
+
+```cpp
+/// Audio is generated incrementally, not in frame-sized chunks
+struct audio_config
+{
+    uint32_t sample_rate;       // 44100 or 48000 Hz
+    uint32_t buffer_frames;     // Samples per buffer (256-2048 typical)
+    uint32_t num_buffers;       // Ring buffer count (2-4 typical)
+};
+
+// Platform requests specific amount of audio
+// Core generates exactly what's needed for cycle-accurate sync
+audio_buffer consume_audio(size_t max_samples);
+```
+
+### Latency vs. Stability Tradeoff
+
+| Buffer Size | Latency | Stability |
+|-------------|---------|-----------|
+| 128 samples (~3ms) | Excellent | May glitch on slow systems |
+| 256 samples (~6ms) | Very good | Stable on most systems |
+| 512 samples (~11ms) | Good | Very stable |
+| 1024 samples (~23ms) | Noticeable | Rock solid |
+
+Default to 256-512 samples; let users adjust based on their hardware.
+
+---
+
 ## Open Questions
 
 1. **Expansion Modules**: How do cartridge/pak DLLs fit into this model? They currently use Windows DLL loading. Need a platform-agnostic module system.
