@@ -54,8 +54,9 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="Docling VLM -> Markdown via Ollama")
     ap.add_argument(
         "--model",
-        default="qwen3-vl:30b",
-        help="Ollama model name (default: qwen3-vl:30b)",
+        # default="qwen3-vl:30b",
+        default="gemma3:27b",
+        help="Ollama model name (default: %(default)s)",
     )
     args = ap.parse_args()
 
